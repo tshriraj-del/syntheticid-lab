@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #080b14;
+  --surface: #0d1117;
+  --surface-raised: #161b22;
+  --surface-high: #1c2333;
+  --border: #30363d;
+  --border-muted: #21262d;
+  --text: #e6edf3;
+  --text-muted: #7d8590;
+  --text-subtle: #484f58;
+  --danger: #f85149;
+  --warning: #e3b341;
+  --success: #3fb950;
+  --accent: #388bfd;
+  --purple: #a371f7;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* Shimmer skeleton */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-raised) 25%,
+    var(--surface-high) 50%,
+    var(--surface-raised) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Timeline step stagger */
+.step-card {
+  opacity: 0;
+  animation: fadeSlideUp 0.45s ease forwards;
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Score bar fill animation */
+.score-bar-fill {
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Circular score SVG */
+.score-circle-path {
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-subtle);
+}
+
+/* Responsive main grid */
+#main-grid {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  #main-grid {
+    grid-template-columns: 380px 1fr;
+  }
+}
+
+/* Detection gap map 2-col */
+.gap-map-grid {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .gap-map-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Recommendations 2-col */
+.rec-grid {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .rec-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Toggle chip hover */
+.defense-chip {
+  transition: all 0.15s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.defense-chip:hover {
+  border-color: var(--accent) !important;
+  color: var(--text) !important;
+}
+
+/* Button base */
+button {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+/* Expandable section */
+.expand-content {
+  overflow: hidden;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+}
+
+/* Tab underline */
+.tab-btn {
+  position: relative;
+  transition: color 0.15s ease;
+}
+
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+}
+
+.tab-btn.active::after {
+  transform: scaleX(1);
+}
+
+/* Spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  animation: spin 0.8s linear infinite;
+}
