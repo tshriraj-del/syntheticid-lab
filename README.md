@@ -3,7 +3,6 @@
 > Part of the **[REDWING](https://github.com/tshriraj-del/redwing-fraud-os)** AI Fraud Detection Platform
 
 ![REDWING](https://img.shields.io/badge/REDWING-AI%20Fraud%20Platform-818cf8?style=for-the-badge)
-![Model](https://img.shields.io/badge/Claude-Sonnet%204.6-0ea5e9?style=for-the-badge)
 ![Stack](https://img.shields.io/badge/Stack-React%20%7C%20Vite%20%7C%20Tailwind-c084fc?style=for-the-badge)
 
 ---
@@ -55,7 +54,7 @@ Simulate attack → identify BYPASSED steps
         ↓
 POST /syntheticid/ingest → Operator appends labelled rows to transactions.csv
         ↓  fraud_typology="synthetic_identity", rule_score=0, ensemble_score=0.85
-Rule Factory detects gaps → Claude generates candidate rules
+Rule Factory detects gaps → generates candidate rules
         ↓  backtest → quality gate (precision > 78% auto-deploy)
 New rules deployed → better coverage → simulate again → repeat
 ```
@@ -78,7 +77,7 @@ git clone https://github.com/tshriraj-del/syntheticid-lab
 cd syntheticid-lab
 npm install
 
-# Add your Anthropic API key
+# Add your LLM API key
 echo "VITE_ANTHROPIC_API_KEY=your_key_here" > .env
 
 npm run dev
@@ -109,7 +108,7 @@ SyntheticID Lab is the **adversarial training layer**. It's the only source in t
 
 ## Stack
 
-React 18 · Vite · Tailwind CSS · Claude Sonnet 4.6 · Anthropic API
+React 18 · Vite · Tailwind CSS · LLM API
 
 ---
 
