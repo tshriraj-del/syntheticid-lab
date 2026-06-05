@@ -222,6 +222,29 @@ export default function App() {
     setTimeout(() => setCopied(false), 2500)
   }
 
+  const [feedStatus, setFeedStatus] = useState(null) // null | 'loading' | 'success' | 'error'
+  const [feedMsg, setFeedMsg] = useState('')
+
+  const feedToRuleFactory = async () => {
+    if (!results) return
+    setFeedStatus('loading')
+    try {
+      const res = await fetch('http://localhost:8000/syntheticid/ingest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform, sophistication, ...results }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.detail || 'Ingest failed')
+      setFeedMsg(`${data.inserted} gap rows → Rule Factory (${data.typologies?.join(', ')})`)
+      setFeedStatus('success')
+    } catch (err) {
+      setFeedMsg(err.message)
+      setFeedStatus('error')
+    }
+    setTimeout(() => { setFeedStatus(null); setFeedMsg('') }, 5000)
+  }
+
   const bypassed = results ? results.attack_timeline.filter(s => s.outcome === 'BYPASSED').length : 0
   const total = results ? results.attack_timeline.length : 0
   const bypassRate = total > 0 ? bypassed / total : 0
@@ -396,8 +419,11 @@ export default function App() {
                 total={total}
                 platform={platform}
                 onExport={exportReport}
-                onReset={() => { setResults(null); setError(null) }}
+                onReset={() => { setResults(null); setError(null); setFeedStatus(null) }}
                 copied={copied}
+                onFeedToRuleFactory={feedToRuleFactory}
+                feedStatus={feedStatus}
+                feedMsg={feedMsg}
               />
             )}
           </div>
@@ -407,7 +433,7 @@ export default function App() {
   )
 }
 
-function ResultsSection({ results, loading, activeTab, setActiveTab, exposureLevel, bypassed, total, platform, onExport, onReset, copied }) {
+function ResultsSection({ results, loading, activeTab, setActiveTab, exposureLevel, bypassed, total, platform, onExport, onReset, copied, onFeedToRuleFactory, feedStatus, feedMsg }) {
   const detected = results ? results.attack_timeline.filter(s => s.outcome === 'DETECTED').length : 0
 
   return (
@@ -550,6 +576,29 @@ function ResultsSection({ results, loading, activeTab, setActiveTab, exposureLev
             }}
           >
             {copied ? '✓ Copied to clipboard' : '↓ Export Report (Markdown)'}
+          </button>
+          <button
+            onClick={onFeedToRuleFactory}
+            disabled={feedStatus === 'loading'}
+            style={{
+              background: feedStatus === 'success' ? 'rgba(63,185,80,0.12)' : feedStatus === 'error' ? 'rgba(248,81,73,0.10)' : 'rgba(74,222,128,0.08)',
+              border: `1px solid ${feedStatus === 'success' ? 'rgba(63,185,80,0.4)' : feedStatus === 'error' ? 'rgba(248,81,73,0.3)' : 'rgba(74,222,128,0.3)'}`,
+              color: feedStatus === 'success' ? '#3fb950' : feedStatus === 'error' ? '#f85149' : '#4ade80',
+              borderRadius: 8,
+              padding: '8px 16px',
+              fontSize: 13,
+              cursor: feedStatus === 'loading' ? 'wait' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              transition: 'all 0.2s ease',
+              opacity: feedStatus === 'loading' ? 0.7 : 1,
+            }}
+          >
+            {feedStatus === 'loading' ? '⟳ Feeding…' :
+             feedStatus === 'success' ? `✓ ${feedMsg}` :
+             feedStatus === 'error'   ? `✗ ${feedMsg}` :
+             '⚡ Feed to Rule Factory'}
           </button>
           <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--text-subtle)' }}>
             AI-generated for defensive planning. Accuracy depends on inputs provided.
