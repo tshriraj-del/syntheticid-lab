@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { callLLM } from './llm-provider.js'
 import InputPanel from './components/InputPanel'
 import AttackTimeline from './components/AttackTimeline'
 import DetectionGapMap from './components/DetectionGapMap'
@@ -169,42 +170,17 @@ export default function App() {
       return
     }
 
-    const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY
-    if (!apiKey) {
-      setError('VITE_ANTHROPIC_API_KEY not found. Create a .env file with your Anthropic API key.')
-      return
-    }
-
     setLoading(true)
     setError(null)
     setResults(null)
     setActiveTab(0)
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 8000,
-          system: SYSTEM_PROMPT,
-          messages: [{ role: 'user', content: buildPrompt(platform, sophistication, defenses) }],
-        }),
+      const raw = await callLLM({
+        systemPrompt: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: buildPrompt(platform, sophistication, defenses) }],
+        maxTokens: 8000,
       })
-
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}))
-        throw new Error(errData.error?.message || `API error ${response.status}`)
-      }
-
-      const data = await response.json()
-      const raw = data.content[0].text
-      // Strip accidental markdown fences
       const clean = raw.replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/i, '').trim()
       setResults(JSON.parse(clean))
     } catch (err) {
